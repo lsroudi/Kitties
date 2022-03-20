@@ -55,7 +55,7 @@ pub mod pallet {
         type Currency: Currency<Self::AccountId>;
 
         // ACTION #5: Specify the type for Randomness we want to specify for runtime.
-
+        type KittyRandomness: Randomness<Self::Hash, Self::BlockNumber>;
         // ACTION #9: Add MaxKittyOwned constant
     }
 
@@ -99,11 +99,24 @@ pub mod pallet {
     impl<T: Config> Pallet<T> {
 
         // ACTION #4: helper function for Kitty struct
-
+        fn gen_gender() -> Gender {
+            let random = T::KittyRandomness::random(&b"gender"[..]).0;
+            match random.as_ref()[0] % 2 {
+                0 => Gender::Male,
+                _ => Gender::Female,
+            }
+        }
         // TODO Part III: helper functions for dispatchable functions
 
         // ACTION #6: function to randomly generate DNA
-
+        fn gen_dna() -> [u8; 16] {
+            let payload = (
+                T::KittyRandomness::random(&b"dna"[..]).0,
+            <frame_system::Pallet<T>>::extrinsic_index().unwrap_or_default(),
+                <frame_system::Pallet<T>>::block_number(),
+            );
+            payload.using_encoded(blake2_128)
+        }
         // TODO Part III: mint
 
         // TODO Part IV: transfer_kitty_to
