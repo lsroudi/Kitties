@@ -195,6 +195,7 @@ pub mod pallet {
             Ok(())
         }
         // TODO Part IV: buy_kitty
+        #[transactional]
         #[pallet::weight(100)]
         pub fn buy_kitty(
             origin: OriginFor<T>,
